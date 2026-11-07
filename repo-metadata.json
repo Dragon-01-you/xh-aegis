@@ -1,0 +1,19 @@
+{
+  "_note": "仓库元数据规范（对齐 repo-optimization-kit v2.0）。description <= 160 字符；topics 20 个。",
+  "name": "xh-aegis",
+  "description": "芯火·灵镜 XH-Aegis：零微调热插拔 Agent 记忆与后台睡眠因果进化系统 | Bio-inspired cognitive memory & causal reflection engine for LLM agents",
+  "homepage": "https://github.com/Dragon-01-you/xh-aegis",
+  "topics": {
+    "生态词": ["python", "cli-tool", "developer-tools", "markdown", "git-time-machine"],
+    "领域大词": ["ai-agent", "llm-memory", "cognitive-architecture", "causal-inference", "proactive-agent"],
+    "竞品关联词": ["openai-api", "deepseek", "claude", "mem0", "memgpt"],
+    "功能词": ["sleep-consolidation", "say-do-audit", "counterfactual-reasoning", "working-memory", "xh-aegis"]
+  },
+  "social_preview": {
+    "file": "assets/social_preview.jpg",
+    "size": "1280x640",
+    "format": "JPG",
+    "max_bytes": 1000000,
+    "upload": "Settings -> Social preview -> Edit -> Upload a photo (GitHub 无公开 API，需网页手动上传一次)"
+  }
+}

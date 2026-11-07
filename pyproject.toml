@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xh-aegis"
+dynamic = ["version"]
+description = "芯火·灵镜 XH-Aegis：零微调热插拔 Agent 记忆与后台睡眠因果进化系统 | Bio-inspired cognitive memory & causal reflection engine for LLM agents"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+keywords = [
+    "python",
+    "cli-tool",
+    "developer-tools",
+    "ai-agent",
+    "agent-memory",
+    "cognitive-architecture",
+    "causal-inference",
+    "llm-memory",
+    "sleep-consolidation",
+    "proactive-agent",
+    "openai-api",
+    "deepseek",
+    "claude",
+    "memgpt",
+    "mem0",
+    "langchain",
+    "xh",
+    "xh-aegis"
+]
+dependencies = [
+    "PyYAML>=6.0"
+]
+
+[project.scripts]
+xh-aegis = "xh_aegis.cli:main"
+xh = "xh_aegis.cli:main"
+cognitive-memory-agent = "xh_aegis.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Dragon-01-you/xh-aegis"
+Repository = "https://github.com/Dragon-01-you/xh-aegis"
+Issues = "https://github.com/Dragon-01-you/xh-aegis/issues"
+Changelog = "https://github.com/Dragon-01-you/xh-aegis/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+include = ["xh_aegis*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "xh_aegis.__version__"}

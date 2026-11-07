@@ -1,0 +1,23 @@
+# 芯火·灵镜 XH-Aegis (`xh-aegis`)
+
+> 给本地 LLM Agent 挂载一套零模型微调、纯文件态的后台睡眠反思与反事实因果进化系统。通过 NREM 浅睡眠过滤噪音、REM 深睡眠执行跨周期言行一致性比对与五态证伪校验，将常驻 L1 工作记忆严格锁定在 160 行以内（不突破 200 行红线），并支持 Git 全自动防幻觉回滚。
+
+## 核心文档
+
+- [README 中文完整手册](https://github.com/Dragon-01-you/xh-aegis#readme): 架构设计、安装、五态证伪机与主动破冰公式
+- [English Documentation](https://github.com/Dragon-01-you/xh-aegis/blob/main/README_EN.md): Full architecture & quick start guide
+- [快速开始](https://github.com/Dragon-01-you/xh-aegis#快速开始): 三步跑通 5 天跨周期言行比对仿真
+- [工作原理](https://github.com/Dragon-01-you/xh-aegis#工作原理): NREM/REM 双阶段睡眠流水线与四层双态存储
+
+## 数据与清单
+
+- [causal_beliefs.json](https://raw.githubusercontent.com/Dragon-01-you/xh-aegis/main/data/causal_beliefs.json): 结构化长期因果信念库（含表象、深层机制、预判、反事实证伪条件与双时间线演化历史）
+- [commitments.json](https://raw.githubusercontent.com/Dragon-01-you/xh-aegis/main/data/commitments.json): 用户立下的 Flag 与言行一致性审计台账
+- [proactive_hooks.json](https://raw.githubusercontent.com/Dragon-01-you/xh-aegis/main/data/proactive_hooks.json): 多维效用门控主动破冰钩子池
+
+## 引用与许可
+
+- [CITATION.cff](https://github.com/Dragon-01-you/xh-aegis/blob/main/CITATION.cff): 学术与工程引用元数据 (v1.0.0, 2026)
+- [LICENSE](https://github.com/Dragon-01-you/xh-aegis/blob/main/LICENSE): MIT 开源许可协议
+- [CHANGELOG.md](https://github.com/Dragon-01-you/xh-aegis/blob/main/CHANGELOG.md): 版本演进记录
+- [CONTRIBUTING.md](https://github.com/Dragon-01-you/xh-aegis/blob/main/CONTRIBUTING.md): 贡献指南与脱敏铁律

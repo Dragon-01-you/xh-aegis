@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <rect x="0" y="0" width="1280" height="640" fill="#f4f2ee"/>
+  <rect x="36" y="36" width="1208" height="568" fill="none" stroke="#111111" stroke-width="1"/>
+  <line x1="36" y1="108" x2="1244" y2="108" stroke="#111111" stroke-width="1"/>
+  <line x1="36" y1="532" x2="1244" y2="532" stroke="#111111" stroke-width="1"/>
+  <line x1="775" y1="108" x2="775" y2="532" stroke="#111111" stroke-width="1"/>
+
+  <rect x="56" y="56" width="48" height="34" fill="#d94e34"/>
+  <text x="80" y="79" font-size="17" font-weight="bold" fill="#f4f2ee" text-anchor="middle">XH</text>
+  <text x="118" y="79" font-size="16" font-weight="bold" fill="#111111">芯火·灵镜 XH-AEGIS · COGNITIVE MEMORY &amp; REFLECTIVE EVOLUTION</text>
+  <text x="1220" y="79" font-size="13" fill="#555555" text-anchor="end">v1.0.0 · ZERO-TRAINING HOT-PLUGGABLE</text>
+
+  <text x="64" y="182" font-size="38" font-weight="bold" fill="#111111">拒绝盲从用户字面借口</text>
+  <text x="64" y="236" font-size="38" font-weight="bold" fill="#d94e34">让 Agent 在睡眠做梦中推导深层因果</text>
+
+  <text x="64" y="294" font-size="16" fill="#222222">在主对话链路外挂载 NREM 浅睡眠蒸馏与 REM 深睡眠反事实证伪引擎，</text>
+  <text x="64" y="322" font-size="16" fill="#222222">穿透碎片化情绪与“口是心非”，将常驻核心工作记忆严格锁定在 160 行预算内。</text>
+
+  <line x1="64" y1="364" x2="740" y2="364" stroke="#111111" stroke-width="1"/>
+  <text x="64" y="408" font-size="26" font-weight="bold" fill="#111111">&lt; 160 Lines</text>
+  <text x="64" y="436" font-size="13" fill="#444444">L1 置顶记忆硬上限</text>
+  <text x="64" y="458" font-size="13" fill="#444444">零上下文爆炸风险</text>
+
+  <line x1="285" y1="376" x2="285" y2="508" stroke="#111111" stroke-width="1"/>
+  <text x="305" y="408" font-size="26" font-weight="bold" fill="#d94e34">5-State</text>
+  <text x="305" y="436" font-size="13" fill="#444444">反事实证伪状态机</text>
+  <text x="305" y="458" font-size="13" fill="#444444">杜绝单次脑补定性</text>
+
+  <line x1="520" y1="376" x2="520" y2="508" stroke="#111111" stroke-width="1"/>
+  <text x="540" y="408" font-size="26" font-weight="bold" fill="#111111">100% Git</text>
+  <text x="540" y="436" font-size="13" fill="#444444">全自动快照时间机器</text>
+  <text x="540" y="458" font-size="13" fill="#444444">一键回滚模型幻觉</text>
+
+  <text x="802" y="148" font-size="13" font-weight="bold" fill="#111111">SAY-DO ALIGNMENT &amp; CAUSAL FALSIFICATION</text>
+  <rect x="802" y="166" width="415" height="94" fill="none" stroke="#111111" stroke-width="1"/>
+  <text x="818" y="192" font-size="13" font-weight="bold" fill="#555555">用户表面原话 (Surface Claim · Day 3)</text>
+  <text x="818" y="218" font-size="14" fill="#111111">“Rust 第三方生态太不成熟了，决定弃坑换 Go 重写”</text>
+  <text x="818" y="242" font-size="12" fill="#d94e34">Signal: 截止夜未交付 + 连续 3h 生命周期编译报错</text>
+
+  <line x1="1010" y1="260" x2="1010" y2="290" stroke="#d94e34" stroke-width="2"/>
+  <polygon points="1004,284 1016,284 1010,294" fill="#d94e34"/>
+
+  <rect x="802" y="296" width="415" height="114" fill="#111111"/>
+  <text x="818" y="324" font-size="13" font-weight="bold" fill="#d94e34">REM 深睡眠因果推导 (VERIFIED · C=0.80)</text>
+  <text x="818" y="350" font-size="13" fill="#f4f2ee">高自尊完美主义防御：目标过大受挫后借批判工具</text>
+  <text x="818" y="372" font-size="13" fill="#f4f2ee">掩盖局部卡点。真实需求是拆解 20 行最小闭环。</text>
+  <text x="818" y="396" font-size="11" fill="#cccccc">证伪条件: 若拆小颗粒度后仍换赛道，则推翻本假说</text>
+
+  <rect x="802" y="428" width="415" height="78" fill="none" stroke="#111111" stroke-width="1"/>
+  <text x="818" y="454" font-size="12" font-weight="bold" fill="#111111">PROACTIVE UTILITY GATE: U = 0.54 &gt;= 0.50</text>
+  <text x="818" y="478" font-size="13" fill="#222222">主动破冰: “把昨晚卡住的 20 行结构体发我，</text>
+  <text x="818" y="498" font-size="13" fill="#222222">我们只花 15 分钟跑通，先把这口气顺过来？”</text>
+
+  <text x="64" y="574" font-size="14" font-weight="bold" fill="#111111">$ pip install -e . &amp;&amp; xh-aegis --auto-demo</text>
+  <text x="1220" y="574" font-size="13" fill="#555555" text-anchor="end">芯火 XH 开源架构系列 · MIT License</text>
+</svg>

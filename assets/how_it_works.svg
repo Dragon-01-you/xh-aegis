@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" width="1200" height="560">
+  <rect x="0" y="0" width="1200" height="560" fill="#f4f2ee"/>
+  <rect x="28" y="28" width="1144" height="504" fill="none" stroke="#111111" stroke-width="1"/>
+  <line x1="28" y1="88" x2="1172" y2="88" stroke="#111111" stroke-width="1"/>
+
+  <text x="52" y="64" font-size="20" font-weight="bold" fill="#111111">XH-Aegis 双阶段仿生睡眠反思与四层双态存储流水线</text>
+  <text x="1148" y="64" font-size="13" font-weight="bold" fill="#d94e34" text-anchor="end">NREM (Fast Model) + REM (Deep Reasoner)</text>
+
+  <rect x="52" y="116" width="245" height="388" fill="none" stroke="#111111" stroke-width="1"/>
+  <rect x="52" y="116" width="245" height="36" fill="#111111"/>
+  <text x="174" y="140" font-size="14" font-weight="bold" fill="#f4f2ee" text-anchor="middle">1. 前台实时对话 (L0/L1)</text>
+  <text x="68" y="182" font-size="13" font-weight="bold" fill="#111111">输入上下文组装：</text>
+  <text x="68" y="208" font-size="12" fill="#333333">• persona.md (只读契约)</text>
+  <text x="68" y="232" font-size="12" font-weight="bold" fill="#d94e34">• working_memory.md (&lt;160行)</text>
+  <text x="68" y="256" font-size="12" fill="#333333">• Top-2 主题胶囊按需挂载</text>
+  <line x1="68" y1="278" x2="280" y2="278" stroke="#111111" stroke-width="1"/>
+  <text x="68" y="306" font-size="13" font-weight="bold" fill="#111111">核心交互纪律：</text>
+  <text x="68" y="330" font-size="12" fill="#333333">• 识别言行冲突温和踩刹车</text>
+  <text x="68" y="354" font-size="12" fill="#333333">• 未证实假说仅试探不盲信</text>
+  <text x="68" y="378" font-size="12" fill="#333333">• 原始对话毫秒级写入 L0</text>
+
+  <line x1="297" y1="310" x2="333" y2="310" stroke="#111111" stroke-width="2"/>
+  <polygon points="327,305 337,310 327,315" fill="#111111"/>
+
+  <rect x="337" y="116" width="245" height="388" fill="none" stroke="#111111" stroke-width="1"/>
+  <rect x="337" y="116" width="245" height="36" fill="#111111"/>
+  <text x="459" y="140" font-size="14" font-weight="bold" fill="#f4f2ee" text-anchor="middle">2. NREM 浅睡眠 (Fast Tier)</text>
+  <text x="353" y="182" font-size="13" font-weight="bold" fill="#111111">闲置 15 分钟异步触发：</text>
+  <text x="353" y="208" font-size="12" fill="#333333">• 过滤日常寒暄与废话噪音</text>
+  <text x="353" y="232" font-size="12" fill="#333333">• 严禁此阶段过度脑补病因</text>
+  <line x1="353" y1="256" x2="565" y2="256" stroke="#111111" stroke-width="1"/>
+  <text x="353" y="284" font-size="13" font-weight="bold" fill="#111111">结构化三锚点提取：</text>
+  <text x="353" y="310" font-size="12" fill="#333333">1. Explicit Claims (原话)</text>
+  <text x="353" y="334" font-size="12" font-weight="bold" fill="#d94e34">2. Commitments (Flag 台账)</text>
+  <text x="353" y="358" font-size="12" fill="#333333">3. Behavioral Signals (情绪)</text>
+  <text x="353" y="394" font-size="11" fill="#555555">Output: episodes/ep_*.json</text>
+
+  <line x1="582" y1="310" x2="618" y2="310" stroke="#d94e34" stroke-width="2"/>
+  <polygon points="612,305 622,310 612,315" fill="#d94e34"/>
+
+  <rect x="622" y="116" width="255" height="388" fill="none" stroke="#d94e34" stroke-width="2"/>
+  <rect x="622" y="116" width="255" height="36" fill="#d94e34"/>
+  <text x="749" y="140" font-size="14" font-weight="bold" fill="#f4f2ee" text-anchor="middle">3. REM 深睡眠做梦 (Deep Tier)</text>
+  <text x="638" y="182" font-size="13" font-weight="bold" fill="#111111">跨天言行比对与反事实证伪：</text>
+  <text x="638" y="208" font-size="12" fill="#333333">• 审计到期 Flag 兑现 vs 借口</text>
+  <text x="638" y="232" font-size="12" fill="#333333">• 推导深层机制 + 证伪边界</text>
+  <line x1="638" y1="256" x2="860" y2="256" stroke="#111111" stroke-width="1"/>
+  <text x="638" y="284" font-size="13" font-weight="bold" fill="#111111">五态认知状态跃迁：</text>
+  <text x="638" y="308" font-size="11" fill="#333333">OBSERVATION -&gt; HYPOTHESIS(&lt;=0.45)</text>
+  <text x="638" y="330" font-size="11" font-weight="bold" fill="#d94e34">-&gt; VERIFIED_PATTERN(&gt;=0.75)</text>
+  <text x="638" y="352" font-size="11" fill="#333333">-&gt; CONTESTED / DEPRECATED</text>
+  <line x1="638" y1="372" x2="860" y2="372" stroke="#111111" stroke-width="1"/>
+  <text x="638" y="398" font-size="12" fill="#111111">• 编译 L1 working_memory.md</text>
+  <text x="638" y="420" font-size="12" fill="#111111">• 生成第一人称复盘日记</text>
+  <text x="638" y="442" font-size="12" font-weight="bold" fill="#d94e34">• 自动提交 Git 快照防幻觉投毒</text>
+
+  <line x1="877" y1="310" x2="913" y2="310" stroke="#111111" stroke-width="2"/>
+  <polygon points="907,305 917,310 907,315" fill="#111111"/>
+
+  <rect x="917" y="116" width="230" height="388" fill="none" stroke="#111111" stroke-width="1"/>
+  <rect x="917" y="116" width="230" height="36" fill="#111111"/>
+  <text x="1032" y="140" font-size="14" font-weight="bold" fill="#f4f2ee" text-anchor="middle">4. 效用门控主动破冰</text>
+  <text x="933" y="182" font-size="13" font-weight="bold" fill="#111111">反骚扰数学门控：</text>
+  <text x="933" y="208" font-size="12" font-weight="bold" fill="#d94e34">U = V * T * C - Cost</text>
+  <text x="933" y="232" font-size="12" fill="#333333">• 仅当 U &gt;= 0.50 时唤醒</text>
+  <text x="933" y="256" font-size="12" fill="#333333">• 23:00-08:00 免打扰静默</text>
+  <text x="933" y="280" font-size="12" fill="#333333">• 连续 2 次未回自动熔断</text>
+  <line x1="933" y1="304" x2="1130" y2="304" stroke="#111111" stroke-width="1"/>
+  <text x="933" y="332" font-size="13" font-weight="bold" fill="#111111">给台阶下话术准则：</text>
+  <text x="933" y="356" font-size="12" fill="#333333">• 禁止监工式追问“做完没”</text>
+  <text x="933" y="380" font-size="12" fill="#333333">• 提供 15 分钟最小行动台阶</text>
+</svg>

@@ -1,0 +1,52 @@
+# ============================================================
+# Cognitive Memory & Reflective Evolution System Configuration
+# ============================================================
+
+system:
+  agent_name: "Aegis"
+  timezone: "Asia/Singapore"
+  data_dir: "./data"
+  git_auto_snapshot: true
+
+# 大小模型路由配置 (Dual-Tier Model Routing)
+models:
+  fast_tier:
+    provider: "openai_compatible"
+    model_name: "gpt-4o-mini"          # 用于前台低延迟对话、L0滑窗意图路由与粗筛
+    temperature: 0.5
+    max_tokens: 800
+  deep_tier:
+    provider: "openai_compatible"
+    model_name: "deepseek-reasoner"    # 用于后台REM睡眠因果反思、言行一致性校验与假设证伪
+    temperature: 0.2
+    max_tokens: 2500
+
+# 记忆容量与防膨胀预算 (Token & Line Guardrails)
+memory_budget:
+  l1_working_memory_max_lines: 160     # 严格控制在 200 行红线以内
+  l1_max_active_beliefs: 12            # 置顶高置信度因果信念上限
+  l1_max_open_commitments: 8           # 置顶待检验 Flag / 承诺上限
+  l0_recent_turns_window: 8            # 前台每次注入最近 N 轮原始对话
+  l2_topic_retrieval_top_k: 2          # 每次按需检索最多挂载 N 个主题档案
+
+# 因果信念状态机阈值 (Epistemic State Machine Thresholds)
+epistemic_rules:
+  initial_hypothesis_confidence: 0.45  # 单次推演初始置信度上限（防脑补定性）
+  corroboration_boost: 0.22            # 跨天言行印证后的置信度增益
+  contradiction_penalty: 0.30          # 言行冲突或反证时的置信度衰减
+  verified_threshold: 0.75             # 晋升为 VERIFIED_PATTERN 的门槛
+  deprecation_threshold: 0.25          # 淘汰降级为 DEPRECATED 的门槛
+
+# 后台睡眠与反思触发条件 (Sleep Cycle Triggers)
+sleep_daemon:
+  idle_timeout_seconds: 900            # 闲置 15 分钟触发浅睡眠 (NREM)
+  deep_rem_min_episodes: 2             # 累计至少 N 段新对话触发深度因果做梦 (REM)
+  audit_git_commit_prefix: "[REM-Cycle]"
+
+# 主动破冰抗骚扰与效用门控 (Proactive Outreach Guardrails)
+proactive_engine:
+  utility_threshold: 0.50              # 综合唤醒效用阈值 U = V * U_timing * C - Cost_intrusion
+  cooldown_hours: 18                   # 两次主动破冰最小冷却间隔
+  max_unanswered_strikes: 2            # 连续 N 次未回复自动进入静默期
+  quiet_hours_start: 23                # 免打扰开始时间 (23:00)
+  quiet_hours_end: 8                   # 免打扰结束时间 (08:00)

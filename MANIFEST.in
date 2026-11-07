@@ -1,0 +1,10 @@
+include README.md
+include README_EN.md
+include LICENSE
+include CHANGELOG.md
+include CITATION.cff
+include llms.txt
+include repo-metadata.json
+recursive-include config *.yaml
+recursive-include data *.md *.json
+recursive-include assets *.svg *.png *.gif *.jpg
