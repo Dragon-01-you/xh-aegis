@@ -1,6 +1,6 @@
 """Data schemas and epistemic state machines for the Cognitive Memory System."""
 from __future__ import annotations
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, asdict, fields
 from enum import Enum
 from typing import List, Optional, Dict, Any
 
@@ -8,7 +8,7 @@ from typing import List, Optional, Dict, Any
 class EpistemicState(str, Enum):
     """认知信念演化状态机（防止单次脑补直接固化为绝对真理）"""
     OBSERVATION = "OBSERVATION"            # L0/L1 客观言行切片（未做深层归因）
-    HYPOTHESIS = "HYPOTHESIS"              # 后台初筛推演出的因果假说（Confidence < 0.55，仅观察不盲信）
+    HYPOTHESIS = "HYPOTHESIS"              # 后台初筛推演出的因果假说（新建恒为 initial_hypothesis_confidence，仅观察不盲信）
     VERIFIED_PATTERN = "VERIFIED_PATTERN"  # 跨周期多次言行印证的深层规律（Confidence >= 0.75，置顶入 L1）
     CONTESTED = "CONTESTED"                # 近期出现反例、处于摇摆修正期的规律
     DEPRECATED = "DEPRECATED"              # 已过时或被证伪的历史规律（归档入 L3，保留演化链）
@@ -126,13 +126,15 @@ class EpisodeDigest:
     commitments_made: List[Dict[str, str]]
     raw_messages: List[Dict[str, str]] = field(default_factory=list)
     processed_by_rem: bool = False
+    commitments_resolved: List[str] = field(default_factory=list)  # NREM 声称已完成的承诺 ID，仅作线索交给 REM 裁决
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "EpisodeDigest":
-        return cls(**data)
+        known = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in data.items() if k in known})
 
 
 @dataclass
@@ -149,6 +151,8 @@ class ProactiveHook:
     icebreaker_draft: str
     related_belief_id: Optional[str] = None
     status: str = "PENDING"      # PENDING / TRIGGERED / EXPIRED / SUPPRESSED
+    related_commitment_id: Optional[str] = None  # 钩子必须锚定在用户自己说过的承诺或已有信念上
+    expires_at: Optional[str] = None             # 过期未触发的钩子自动作废，避免一周后还追问旧事
 
     @property
     def net_utility(self) -> float:
@@ -163,5 +167,5 @@ class ProactiveHook:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "ProactiveHook":
-        clean = {k: v for k, v in data.items() if k != "net_utility"}
-        return cls(**clean)
+        known = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in data.items() if k in known})

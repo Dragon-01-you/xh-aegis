@@ -21,6 +21,13 @@ models:
     temperature: 0.2
     max_tokens: 2500
 
+# 模型调用可靠性（真实调用时生效；每个 tier 还可单独设置 api_key_env / base_url / json_mode）
+# 例：deep_tier 下加  api_key_env: DEEPSEEK_API_KEY  与  base_url: https://api.deepseek.com/v1
+llm:
+  retries: 1                           # 429/5xx/超时 时的重试次数
+  retry_backoff_seconds: 2
+  timeout_seconds: 60
+
 # 记忆容量与防膨胀预算 (Token & Line Guardrails)
 memory_budget:
   l1_working_memory_max_lines: 160     # 严格控制在 200 行红线以内
@@ -28,13 +35,17 @@ memory_budget:
   l1_max_open_commitments: 8           # 置顶待检验 Flag / 承诺上限
   l0_recent_turns_window: 8            # 前台每次注入最近 N 轮原始对话
   l2_topic_retrieval_top_k: 2          # 每次按需检索最多挂载 N 个主题档案
+  l2_min_score: 2                      # 用户输入与主题档案至少共享 N 个词/二字组才挂载
 
 # 因果信念状态机阈值 (Epistemic State Machine Thresholds)
 epistemic_rules:
   initial_hypothesis_confidence: 0.45  # 单次推演初始置信度上限（防脑补定性）
-  corroboration_boost: 0.22            # 跨天言行印证后的置信度增益
-  contradiction_penalty: 0.30          # 言行冲突或反证时的置信度衰减
-  verified_threshold: 0.75             # 晋升为 VERIFIED_PATTERN 的门槛
+  corroboration_boost: 0.22            # 每出现一段【新的】支持证据情节，置信度增加的固定幅度（模型无权指定数值）
+  contradiction_penalty: 0.30          # 每出现一段【新的】反证情节，置信度减少的固定幅度
+  new_belief_min_evidence: 2           # 新建假说至少需要 N 段真实存在的证据情节
+  verified_threshold: 0.75             # 晋升为 VERIFIED_PATTERN 的置信度门槛
+  verified_min_episodes: 3             # ……并且至少 N 段不同的证据情节
+  verified_min_days: 2                 # ……并且证据至少跨 N 个不同日历日
   deprecation_threshold: 0.25          # 淘汰降级为 DEPRECATED 的门槛
 
 # 后台睡眠与反思触发条件 (Sleep Cycle Triggers)
@@ -47,6 +58,7 @@ sleep_daemon:
 proactive_engine:
   utility_threshold: 0.50              # 综合唤醒效用阈值 U = V * U_timing * C - Cost_intrusion
   cooldown_hours: 18                   # 两次主动破冰最小冷却间隔
-  max_unanswered_strikes: 2            # 连续 N 次未回复自动进入静默期
+  max_unanswered_strikes: 2            # 连续 N 次未回复自动进入静默期（计数落盘，用户发言才清零）
+  hook_ttl_hours: 72                   # 钩子生成后超过 N 小时未触发即作废
   quiet_hours_start: 23                # 免打扰开始时间 (23:00)
   quiet_hours_end: 8                   # 免打扰结束时间 (08:00)

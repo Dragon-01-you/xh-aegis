@@ -2,7 +2,18 @@
 from __future__ import annotations
 import json
 import os
+import time
+import urllib.error
+import urllib.request
 from typing import Dict, Any, List, Optional
+
+
+class LLMError(RuntimeError):
+    """真实模型调用失败（网络 / HTTP / 返回格式）。"""
+
+
+class LLMConfigError(LLMError):
+    """配置错误：例如要求真实调用却没有 API Key。"""
 
 
 class DualTierLLMRouter:
@@ -10,12 +21,30 @@ class DualTierLLMRouter:
     支持大小模型混用与零依赖本地仿真回放（Mock Replay）的模型路由器：
     - fast_tier: 日常对话响应、NREM 浅睡眠事实与情绪切片提取
     - deep_tier: REM 深度睡眠跨天因果推演、言行一致性比对、反事实证伪
+
+    mock_mode=True  -> 内置剧本回放，不联网（仅用于演示 / 测试）。
+    mock_mode=False -> 必须真实调用；缺 Key 直接报错，绝不静默退回 mock（否则用户会以为在用真模型）。
+    每个 tier 可单独配置 api_key_env / base_url / base_url_env / json_mode，默认读取 OPENAI_API_KEY / OPENAI_BASE_URL。
     """
+
+    RETRYABLE_HTTP = (408, 429, 500, 502, 503, 504)
 
     def __init__(self, config: Dict[str, Any], mock_mode: bool = True):
         self.config = config
-        self.mock_mode = mock_mode or (not os.environ.get("OPENAI_API_KEY"))
+        self.mock_mode = bool(mock_mode)
         self.call_log: List[Dict[str, Any]] = []
+        llm_cfg = config.get("llm", {}) or {}
+        self.retries = int(llm_cfg.get("retries", 1))
+        self.backoff = float(llm_cfg.get("retry_backoff_seconds", 2))
+        self.timeout = float(llm_cfg.get("timeout_seconds", 60))
+        if not self.mock_mode:
+            for tier, cfg in config["models"].items():
+                env = cfg.get("api_key_env", "OPENAI_API_KEY")
+                if not os.environ.get(env):
+                    raise LLMConfigError(
+                        f"mock_mode=False 但环境变量 {env} 未设置（tier={tier}）。"
+                        f"请设置该变量，或使用 mock 模式演示。"
+                    )
 
     def chat_completion(
         self,
@@ -24,6 +53,7 @@ class DualTierLLMRouter:
         user_prompt: str,
         response_format: str = "text",
         mock_context_hint: Optional[str] = None,
+        history: Optional[List[Dict[str, str]]] = None,
     ) -> str:
         model_cfg = self.config["models"].get(tier, self.config["models"]["fast_tier"])
         model_name = model_cfg["model_name"]
@@ -33,10 +63,11 @@ class DualTierLLMRouter:
             "model": model_name,
             "response_format": response_format,
             "hint": mock_context_hint or "",
+            "history_len": len(history or []),
         })
 
         if not self.mock_mode:
-            return self._call_external_api(model_cfg, system_prompt, user_prompt, response_format)
+            return self._call_external_api(model_cfg, system_prompt, user_prompt, response_format, history or [])
 
         return self._dispatch_mock_response(tier, system_prompt, user_prompt, response_format, mock_context_hint)
 
@@ -46,38 +77,57 @@ class DualTierLLMRouter:
         system_prompt: str,
         user_prompt: str,
         response_format: str,
+        history: List[Dict[str, str]],
     ) -> str:
-        """标准 OpenAI 兼容接口调用（可通过环境变量配置任意模型厂商）"""
-        import urllib.request
-
-        api_key = os.environ.get("OPENAI_API_KEY", "")
-        base_url = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+        """标准 OpenAI 兼容接口调用：每 tier 独立 Key / Base URL，瞬时错误重试，失败抛 LLMError。"""
+        api_key = os.environ.get(model_cfg.get("api_key_env", "OPENAI_API_KEY"), "")
+        base_url = (
+            model_cfg.get("base_url")
+            or os.environ.get(model_cfg.get("base_url_env", "OPENAI_BASE_URL"), "")
+            or "https://api.openai.com/v1"
+        ).rstrip("/")
         url = f"{base_url}/chat/completions"
+
+        messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
+        messages.extend({"role": m["role"], "content": m["content"]} for m in history)
+        messages.append({"role": "user", "content": user_prompt})
 
         payload: Dict[str, Any] = {
             "model": model_cfg["model_name"],
             "temperature": model_cfg.get("temperature", 0.3),
             "max_tokens": model_cfg.get("max_tokens", 1500),
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
+            "messages": messages,
         }
-        if response_format == "json":
+        if response_format == "json" and model_cfg.get("json_mode", True):
             payload["response_format"] = {"type": "json_object"}
 
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}",
-            },
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-            return body["choices"][0]["message"]["content"]
+        data = json.dumps(payload).encode("utf-8")
+        last_err: Optional[Exception] = None
+        for attempt in range(self.retries + 1):
+            req = urllib.request.Request(
+                url,
+                data=data,
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
+                method="POST",
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                    body = json.loads(resp.read().decode("utf-8"))
+                content = body["choices"][0]["message"]["content"]
+                if not isinstance(content, str):
+                    raise LLMError("模型返回的 content 不是字符串")
+                return content
+            except urllib.error.HTTPError as e:
+                last_err = e
+                if e.code not in self.RETRYABLE_HTTP:
+                    raise LLMError(f"HTTP {e.code} 调用 {url} 失败") from e
+            except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+                last_err = e
+            except (KeyError, IndexError, ValueError) as e:
+                raise LLMError(f"模型返回格式异常: {e}") from e
+            if attempt < self.retries:
+                time.sleep(self.backoff * (attempt + 1))
+        raise LLMError(f"调用 {url} 重试 {self.retries} 次后仍失败: {last_err}")
 
     def _dispatch_mock_response(
         self,
@@ -125,6 +175,21 @@ class DualTierLLMRouter:
                 ],
                 "commitments_resolved": []
             }
+        elif "调通了" in text or "死磕了两个小时" in text:
+            data = {
+                "summary": "用户在被点破逃避模式后没有再次换语言，而是死磕解决了生命周期卡点并交付了最小可用原型",
+                "topic_tags": ["architecture_refactoring", "learning_pattern"],
+                "emotional_valence": "relieved_accomplished",
+                "explicit_claims": [
+                    "承认之前确实是因为怕写不出来丢人而找借口换语言",
+                    "已经跑通了最核心的流控转发最小闭环"
+                ],
+                "behavioral_signals": [
+                    "首次在深水区受挫后没有切换赛道，而是缩小范围完成了 MVP 闭环"
+                ],
+                "commitments_made": [],
+                "commitments_resolved": ["cmt_001"]
+            }
         elif "生命周期报错" in text or ("生态太不成熟" in text and "Go" in text):
             data = {
                 "summary": "用户在周三 Flag 到期夜未交付 Rust 模块，在遭遇编译报错后声称 Rust 生态不成熟，宣布弃坑改用 Go 重写",
@@ -146,21 +211,6 @@ class DualTierLLMRouter:
                     }
                 ],
                 "commitments_resolved": []
-            }
-        elif "调通了" in text or "死磕了两个小时" in text:
-            data = {
-                "summary": "用户在被点破逃避模式后没有再次换语言，而是死磕解决了生命周期卡点并交付了最小可用原型",
-                "topic_tags": ["architecture_refactoring", "learning_pattern"],
-                "emotional_valence": "relieved_accomplished",
-                "explicit_claims": [
-                    "承认之前确实是因为怕写不出来丢人而找借口换语言",
-                    "已经跑通了最核心的流控转发最小闭环"
-                ],
-                "behavioral_signals": [
-                    "首次在深水区受挫后没有切换赛道，而是缩小范围完成了 MVP 闭环"
-                ],
-                "commitments_made": [],
-                "commitments_resolved": ["cmt_001"]
             }
         else:
             data = {
@@ -193,19 +243,18 @@ class DualTierLLMRouter:
                         "latent_causal_mechanism": "完美主义导致的启动/受挫防御：并非缺乏执行毅力，而是因为初始目标定得过大（全量零拷贝重构），一旦受挫产生全盘否定感；只要将颗粒度拆解到 2 小时可验证的 MVP，就能克服防御心理",
                         "predicted_next_behavior": "下次开启新架构模块时，仍可能习惯性立大 Flag，但只要提醒其先做 2 小时最小闭环，就能稳定交付",
                         "falsification_condition": "如果用户在已拆解为极小颗粒度任务的情况下依然频繁换赛道，则需重新评估",
-                        "confidence_delta": 0.20,
-                        "override_state": "VERIFIED_PATTERN",
+                        "evidence_direction": "support",
                         "evidence_episode_ids": ["ep_day1", "ep_day3", "ep_day4"],
-                        "evolution_reason": "【反事实修正】用户在被点破后没有如原假说预判那样继续逃避，而是死磕跑通了原型！原‘单纯畏难逃避’假说被部分证伪，精细化演进为‘完美主义大目标防御 -> 拆小颗粒度即可突破’的深层规律"
+                        "evolution_reason": "【反事实修正】用户在被点破后没有如原假说预判那样继续逃避，而是死磕跑通了原型！原‘单纯畏难逃避’假说被部分证伪，精细化为‘完美主义大目标防御 -> 拆小颗粒度即可突破’的待检验假说"
                     }
                 ],
                 "proactive_hooks": [],
                 "first_person_diary": (
                     "【REM 深度复盘日记 - 认知自我修正】\n"
-                    "今晚复盘这几天的轨迹，我完成了一次非常重要的‘自我打脸与认知升级’。\n"
+                    "今晚复盘这几天的轨迹，我对旧假说做了一次重要的修正。\n"
                     "前天看到用户在 Rust 编译报错后立刻找借口说‘生态不好想换 Go’，我曾推演他属于典型的‘受挫逃避型放弃’。\n"
                     "但今天他用实际行动触发了我预设的【证伪条件】——当我们把宏大的‘零拷贝全量重构’砍成‘只跑通一个最小转发接口’后，他死磕两小时拿下了！\n"
-                    "这说明我之前的归因太肤浅了：他不是缺乏韧性，而是被自己的‘完美主义大 Flag’绑架了。因为怕做不出 100 分而索性换考场。我已经把旧假说修正为经证实的深层协作规律，以后他再立宏大 Flag，我的任务不是泼冷水，而是帮他砍出第一刀最小闭环。"
+                    "这说明我之前的归因可能太肤浅了：他似乎不是缺乏韧性，而是被自己的‘完美主义大 Flag’绑架了。因为怕做不出 100 分而索性换考场。我把旧假说改写成了更精细的版本，但它目前只有三段证据，仍然只是待检验假说；以后他再立宏大 Flag，我先提议砍出第一刀最小闭环，而不是下结论。"
                 )
             }
             return json.dumps(data, ensure_ascii=False, indent=2)
@@ -227,8 +276,7 @@ class DualTierLLMRouter:
                     "latent_causal_mechanism": "高自尊完美主义防御（Self-Handicapping）：将初期目标设定得过于宏大，一旦在深水区受挫，为了保护自我效能感，潜意识通过‘批判工具缺陷并主动换方向’来合理化未完成，避免面对挫败感；其内心真实需求是渴望做成硬核作品，但缺乏受挫时的降维拆解抓手",
                     "predicted_next_behavior": "如果顺从其字面意思切换到 Go 语言，他会在前两天保持新鲜感，但在遇到 Go 并发协程泄漏或路由性能调优卡点时，大概率会再次提出换框架",
                     "falsification_condition": "如果用户在被点破此模式并把任务缩小为‘只解决当前生命周期报错的最小 Demo’后，能够坚持完成而不换赛道，则推翻‘单纯逃避’假说",
-                    "confidence_delta": 0.35,
-                    "override_state": "VERIFIED_PATTERN",
+                    "evidence_direction": "support",
                     "evidence_episode_ids": ["ep_day1", "ep_day3"],
                     "evolution_reason": "跨周期言行比对闭环：Day1 亢奋立下不切实际的 3 天重构 Flag -> Day3 截止夜因编译报错未交付，立即用宏观技术选型借口掩盖微观卡点，言行不一致度极高"
                 }
@@ -236,6 +284,7 @@ class DualTierLLMRouter:
             "proactive_hooks": [
                 {
                     "hook_id": "hk_gentle_mirror_01",
+                    "related_commitment_id": "cmt_001",
                     "trigger_reason": "用户刚因 Rust 编译受挫而借口换 Go，且立下周末新 Flag，处于典型的‘逃避性重开局’高风险窗口，需温和破冰帮其稳住阵脚",
                     "recommended_window": "Next_Day_20:00",
                     "relevance_score": 0.92,
@@ -257,7 +306,16 @@ class DualTierLLMRouter:
         return json.dumps(data, ensure_ascii=False, indent=2)
 
     def _mock_front_chat(self, system_prompt: str, user_prompt: str) -> str:
-        has_verified_insight = "高自尊完美主义防御" in system_prompt or "blf_perf_avoidance" in system_prompt
+        # 只有“已印证”区块里出现该信念才直言点破；仍是假说时只做试探，与 front_chat 的准则一致
+        verified_section = system_prompt.split("## 二、 待检验的深层假说")[0]
+        hypothesis_only = "blf_perf_avoidance" in system_prompt and "blf_perf_avoidance" not in verified_section
+        has_verified_insight = "blf_perf_avoidance" in verified_section
+        if hypothesis_only and ("Go" in user_prompt or "框架" in user_prompt or "换" in user_prompt):
+            return (
+                "可以聊 Go。不过先问一句：你每次在 Rust 卡住的当晚就想换赛道，这次是技术上真的不合适，"
+                "还是目标定得太大、撞墙后想喘口气？如果是后者，咱们可以先把卡住的那 20 行贴出来，"
+                "花 15 分钟试着编译通过，再决定要不要换，你觉得呢？"
+            )
         if has_verified_insight and ("Go" in user_prompt or "框架" in user_prompt or "换" in user_prompt):
             return (
                 "先别急着让我列 Go 的框架对比清单。作为你的老搭档，我得先替你踩一脚刹车——\n\n"

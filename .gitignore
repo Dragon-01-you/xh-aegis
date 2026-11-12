@@ -14,3 +14,7 @@ venv/
 .env
 .env.*
 *.log
+
+# Runtime memory data (only the persona template is tracked)
+data/*
+!data/persona.md

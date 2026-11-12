@@ -28,5 +28,6 @@ jobs:
         run: |
           python -m xh_aegis.cli --version
           python -m xh_aegis.cli --help > /dev/null
+          python -m xh_aegis.cli --auto-demo > /dev/null
       - name: Run unit & counterfactual falsification tests
-        run: python tests/test_cognitive_memory.py -v
+        run: python -m unittest discover -s tests -v
