@@ -33,7 +33,7 @@ Standard agent memory systems act like literal tape recorders: if a user hits a 
 | 2 | How do you stop the LLM from over-psychoanalyzing a single casual complaint into a permanent label? | Every inferred pattern starts as a low-confidence `HYPOTHESIS` ($\le 0.45$) with a mandatory `falsification_condition` and only promotes to `VERIFIED_PATTERN` ($\ge 0.75$) after multi-day corroboration |
 | 3 | How do you prevent long-term memory from bloating the context window over months of use? | Dual-representation storage: Python deterministically compiles `working_memory.md` under a strict 160-line ceiling while offloading deep histories to on-demand L2 topic capsules |
 | 4 | What if a background reflection cycle hallucinates and corrupts long-term memory? | Every REM cycle automatically commits a `[REM-Cycle]` Git snapshot in `data/`, enabling one-command `/rollback` recovery |
-| 5 | How can an agent proactively check in without feeling like an annoying cron alarm? | A utility gate $U_{	ext{wake}} = V 	imes T 	imes C - 	ext{Cost} \ge 0.50$ combined with quiet hours (23:00–08:00) and a 2-strike unanswered circuit breaker |
+| 5 | How can an agent proactively check in without feeling like an annoying cron alarm? | A utility gate $U_{\text{wake}} = V \times T \times C - \text{Cost} \ge 0.50$ combined with quiet hours (23:00–08:00) and a 2-strike unanswered circuit breaker |
 
 ---
 
@@ -85,7 +85,7 @@ xh-aegis
 | **NREM Light Sleep** | `fast_tier` | Filter noise; extract explicit claims, emotional cues, and commitments | `data/episodes/ep_*.json` + `data/commitments.json` |
 | **REM Deep Sleep** | `deep_tier` | Cross-day Say-Do audit, abductive causal inference, falsification check | `data/causal_beliefs.json` + `data/reflections/*.md` + Git Commit |
 | **L1 Compiler** | Deterministic Python | Compile verified beliefs & active flags under a strict 160-line budget | `data/working_memory.md` (`<= 160` lines) |
-| **Proactive Gate** | `fast_tier` | Evaluate $U_{	ext{wake}} \ge 0.50$, quiet hours, and strike limits | Low-friction icebreaker message |
+| **Proactive Gate** | `fast_tier` | Evaluate $U_{\text{wake}} \ge 0.50$, quiet hours, and strike limits | Low-friction icebreaker message |
 
 ---
 

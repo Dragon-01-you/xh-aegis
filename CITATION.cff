@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use XH-Aegis in your research or engineering projects, please cite it as below."
 title: "XH-Aegis: Bio-Inspired Cognitive Memory and Counterfactual Causal Reflection Engine for Autonomous Agents"
-version: 1.0.0
+version: 1.1.0
 date-released: 2026-11-07
 url: "https://github.com/Dragon-01-you/xh-aegis"
 repository-code: "https://github.com/Dragon-01-you/xh-aegis"

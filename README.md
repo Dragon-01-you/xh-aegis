@@ -33,7 +33,7 @@
 | 2 | 让大模型推导深层心理动机，怎么防止它“过度脑补”给用户乱贴死标签？ | 强制执行**五态反事实证伪状态机**：单次推演只能存为 `HYPOTHESIS`（置信度 $\le 0.45$），且必须写明 `falsification_condition`（出现什么反例就推翻该假说） |
 | 3 | 长期运行几个月后，记忆文件会不会撑爆上下文窗口导致 Token 费用失控？ | 采用 **JSON 主存储 + Markdown 确定性编译**：`working_memory.md` 硬编码锁定在 $\le 160$ 行红线内，冷档案按需检索 Top-2 主题胶囊 |
 | 4 | 如果后台做梦某次推理抽风，把长期记忆污染了怎么办？ | 每次 REM 周期更新记忆后自动调用 Git 底层命令生成 `[REM-Cycle]` 快照，支持 `/rollback` 一键无损回退到任意历史认知节点 |
-| 5 | 怎么让 Agent 主动找我聊天，但又不会变成烦人的“定时闹钟监工”？ | 引入唤醒净效用公式 $U_{	ext{wake}} = V 	imes T 	imes C - 	ext{Cost} \ge 0.50$，叠加 23:00–08:00 免打扰窗口与连续 2 次未回自动静默熔断 |
+| 5 | 怎么让 Agent 主动找我聊天，但又不会变成烦人的“定时闹钟监工”？ | 引入唤醒净效用公式 $U_{\text{wake}} = V \times T \times C - \text{Cost} \ge 0.50$，叠加 23:00–08:00 免打扰窗口与连续 2 次未回自动静默熔断 |
 
 ---
 
@@ -43,7 +43,7 @@
 ![xh-aegis 跨周期言行比对与反事实因果进化终端实录](assets/demo.gif)
 </div>
 
-上方终端 GIF 为 `xh-aegis --auto-demo` 的真实运行浓缩回放：完整展示了从 **Day 1 亢奋立下 Rust 重构大 Flag** $	o$ **Day 3 编译受挫 3 小时后借口“生态不成熟”想换 Go** $	o$ **深夜 REM 做梦识破高自尊完美主义防御并提交 Git 快照 `d51db66`** $	o$ **Day 4 晚间效用门控 $U=0.54 \ge 0.50$ 触发低压力破冰** $	o$ **Day 5 用户死磕调通后触发证伪条件完成认知升级** 的全闭环。
+上方终端 GIF 为 `xh-aegis --auto-demo` 的真实运行浓缩回放：完整展示了从 **Day 1 亢奋立下 Rust 重构大 Flag** $\to$ **Day 3 编译受挫 3 小时后借口“生态不成熟”想换 Go** $\to$ **深夜 REM 做梦提出“完美主义大目标防御”假说（初始置信度 0.45，仅作待检验假说）并提交做梦前/后两个 Git 快照** $\to$ **Day 4 晚间效用门控 $U=0.54 \ge 0.50$ 触发低压力破冰** $\to$ **Day 5 用户死磕调通，新证据按固定幅度入账（0.45→0.67），仍未达到晋升门槛，继续观察** 的全闭环。
 
 ---
 
@@ -87,7 +87,7 @@ pip install -e .
 xh-aegis --auto-demo
 
 # 3. 运行单元测试或进入交互式调试终端
-python3 tests/test_cognitive_memory.py -v
+python3 -m unittest discover -s tests -v
 xh-aegis
 ```
 
@@ -125,7 +125,7 @@ agent.sleep_engine.run_rem_deep_dreaming()     # REM 深睡眠跨周期因果反
 | **Phase 1: NREM 浅睡眠** | 闲置 15 分钟 / `/nrem`（`fast_tier` 小模型） | 过滤寒暄废话，客观提取【字面表态】、【行为情绪线索】与【立下的 Flag】 | `data/episodes/ep_*.json` + `data/commitments.json` |
 | **Phase 2: REM 深睡眠** | 累计 $\ge 2$ 个切片 / `/rem`（`deep_tier` 强推理模型） | 跨天言行一致性审计、反事实因果溯源、五态置信度演进、第一人称日记生成 | `data/causal_beliefs.json` + `data/reflections/*.md` + Git 快照 |
 | **L1/L2 双态编译** | 每次睡眠周期结束自动触发 | Python 编译器将高置信度信念与活跃 Flag 渲染为常驻 Markdown 与主题档案 | `data/working_memory.md`（**硬上限 $\le 160$ 行**）+ `data/topics/*.md` |
-| **主动破冰门控** | 定时心跳 / `/wake` | 计算 $U_{	ext{wake}} = V 	imes T 	imes C - 	ext{Cost}$，校验免打扰时段与未回熔断计数 | `data/proactive_hooks.json`（仅当 $U \ge 0.50$ 时唤醒） |
+| **主动破冰门控** | 定时心跳 / `/wake` | 计算 $U_{\text{wake}} = V \times T \times C - \text{Cost}$，校验免打扰时段与未回熔断计数 | `data/proactive_hooks.json`（仅当 $U \ge 0.50$ 时唤醒） |
 
 ---
 
@@ -141,7 +141,7 @@ agent.sleep_engine.run_rem_deep_dreaming()     # REM 深睡眠跨周期因果反
 
 ### 认知信念五态跃迁标准
 
-`OBSERVATION (客观观察切片)` $	o$ `HYPOTHESIS (待检验假说, C <= 0.45)` $	o$ `VERIFIED_PATTERN (跨周期印证规律, C >= 0.75, 晋升 L1 置顶)` $	o$ `CONTESTED (出现反例摇摆期)` $	o$ `DEPRECATED (已证伪/过时归档, C <= 0.25)`
+`OBSERVATION (客观观察切片)` $\to$ `HYPOTHESIS (待检验假说, C <= 0.45)` $\to$ `VERIFIED_PATTERN (跨周期印证规律, C >= 0.75, 晋升 L1 置顶)` $\to$ `CONTESTED (出现反例摇摆期)` $\to$ `DEPRECATED (已证伪/过时归档, C <= 0.25)`
 
 ---
 
@@ -158,16 +158,26 @@ agent.sleep_engine.run_rem_deep_dreaming()     # REM 深睡眠跨周期因果反
 
 ## 实际案例（脱敏）
 
-以下为 `xh-aegis` 在开发者日常架构重构场景中的真实脱敏运行审计记录（完整数据见 [`data/causal_beliefs.json`](data/causal_beliefs.json) 与 [`data/commitments.json`](data/commitments.json)）：
+以下为 `xh-aegis` 在开发者日常架构重构场景中的真实脱敏运行审计记录（运行 `xh-aegis --auto-demo` 可在临时目录完整复现，不会改动你自己的 `data/`；演示由内置 mock 剧本驱动，用于展示机制而非证明模型能力）：
 
 | 周期节点 | 观察到的表象与行为信号 | REM 深度睡眠推演结论 | 证据等级与状态跃迁 |
 |:---:|---|---|---|
 | **Day 1 (周一)** | 用户亢奋立下 Flag (`cmt_001`)：周三 22:00 前用 Rust 写完零拷贝解析器与流控网关 | NREM 记录初始承诺，暂不做过度心理归因 | `OBSERVATION` (`cmt_001` = `ACTIVE`) |
-| **Day 3 (周三夜)** | 截止时间未交付代码；连续 3 小时遭遇生命周期报错后，声称“Rust 生态太差，决定换 Go 重写” | **言行冲突报警**：识别出将“局部编译受挫”包装为“宏观技术栈缺陷”的防御性借口 | `cmt_001` $	o$ `ABANDONED_WITH_EXCUSE`；`blf_perf_avoidance` 晋升 `VERIFIED_PATTERN` ($C=0.80$) |
-| **Day 4 (周四晚)** | 晚 20:00 心跳评估：$V=0.92, T=0.88, C=0.82, 	ext{Cost}=0.12 \implies U=0.54 \ge 0.50$ | 触发主动破冰，不追问进度，而是提议“只花 15 分钟一起跑通昨晚卡住的 20 行结构体” | 钩子 `hk_gentle_mirror_01` 状态 $	o$ `TRIGGERED` |
-| **Day 5 (周五晚)** | 用户听劝拆小目标，死磕 2 小时成功调通最小闭环，未再提换语言 | **触发反事实证伪条件**：推翻“单纯畏难逃避”粗略定性，升级为“完美主义大目标防御，拆解 2 小时 MVP 即可突破” | 保持 `VERIFIED_PATTERN` ($C=0.80 	o 0.98$)，双时间线写入 `evolution_history` |
+| **Day 3 (周三夜)** | 截止时间未交付代码；连续 3 小时遭遇生命周期报错后，声称“Rust 生态太差，决定换 Go 重写” | **言行冲突报警**：识别出将“局部编译受挫”包装为“宏观技术栈缺陷”的防御性借口 | `cmt_001` $\to$ `ABANDONED_WITH_EXCUSE`；`blf_perf_avoidance` 新建为 `HYPOTHESIS` ($C=0.45$，规则固定，模型无权指定) |
+| **Day 4 (周四晚)** | 晚 20:00 心跳评估：$V=0.92, T=0.88, C=0.82, \text{Cost}=0.12 \implies U=0.54 \ge 0.50$ | 触发主动破冰，不追问进度，而是提议“只花 15 分钟一起跑通昨晚卡住的 20 行结构体” | 钩子 `hk_gentle_mirror_01` 状态 $\to$ `TRIGGERED` |
+| **Day 5 (周五晚)** | 用户听劝拆小目标，死磕 2 小时成功调通最小闭环，未再提换语言 | **新证据入账**：旧假说被细化为“完美主义大目标防御，拆解 2 小时 MVP 即可突破”，但证据仅 3 段，未达晋升门槛 | 仍为 `HYPOTHESIS` ($C=0.45 \to 0.67$)；晋升 `VERIFIED_PATTERN` 需 $C \ge 0.75$ 且 $\ge 3$ 段不同证据、跨 $\ge 2$ 个日历日；演化轨迹写入 `evolution_history` |
 
 ---
+
+## 可信度与可靠性约定（v1.1）
+
+- **模型只能提议，规则才能裁决**：模型输出里的 `override_state` / `confidence_delta` 一律忽略；新建信念恒为 `HYPOTHESIS`，置信度增减幅度取自 `settings.yaml`（`corroboration_boost` / `contradiction_penalty`），且只有出现**新的**证据情节才会调整，同一证据重复提交不会刷高置信度。
+- **晋升有硬门槛**：`C >= 0.75` 且 `>= 3` 段不同证据情节、跨 `>= 2` 个日历日；证据 ID 必须真实存在，编造的会被丢弃。
+- **失败不丢数据**：NREM 蒸馏失败时对话仍留在落盘的 L0 缓冲区；REM 输出非法 / 为空时本轮作废、情节保持未处理；REM 前后各打一个 Git 快照，中途异常自动回退。
+- **前台模型有记忆**：每轮会带上最近 `l0_recent_turns_window` 轮真实对话。
+- **主动唤醒克制**：熔断计数与上次发送时间落盘；遵守 `cooldown_hours`；钩子必须锚定用户自己说过的承诺（或已有信念），置信度被信念真实置信度封顶，72 小时未触发自动过期；发给用户的话术模型看不到后台对其动机的推断。
+- **真实调用不会悄悄退回 mock**：`--live` 缺 Key 直接报错；每个模型档位可单独配置 `api_key_env` / `base_url`。
+- **仍然存在的限制**：mock 模式的“抽取 / 反思”是按演示剧本硬编码的回放；`sleep_daemon.idle_timeout_seconds` 对应的空闲自动触发守护进程尚未实现（目前通过 `/nrem`、`/rem`、`/wake` 手动触发或自行调度）。
 
 ## 常见问题
 
@@ -202,7 +212,7 @@ agent.sleep_engine.run_rem_deep_dreaming()     # REM 深睡眠跨周期因果反
 - [x] 四层混合双态记忆存储引擎（L0 滑窗 / L1 `<160` 行核心编译视图 / L2 主题胶囊 / L3 冷归档）
 - [x] 仿生双阶段睡眠反思流水线（NREM 轻量事实蒸馏 + REM 跨天言行一致性审计与因果溯源）
 - [x] 带反事实证伪条件（`falsification_condition`）的五态认知信念状态机与双时间线演化历史
-- [x] 多维效用门控（$U_{	ext{wake}}$）主动破冰引擎与连续未回复防骚扰熔断器
+- [x] 多维效用门控（$U_{\text{wake}}$）主动破冰引擎与连续未回复防骚扰熔断器
 - [x] `data/` 记忆库全自动 Git 快照与 `/rollback` 一键防投毒回滚
 - [ ] 支持基于本地 SQLite FTS5 的海量 L3 历史冷切片混合检索
 - [ ] 提供桌面端菜单栏守护进程（macOS / Linux Systemd Timer 一键挂载）
@@ -216,10 +226,10 @@ agent.sleep_engine.run_rem_deep_dreaming()     # REM 深睡眠跨周期因果反
 
 ```bash
 # 1. 运行端到端单元测试与反事实修正回归测试
-python3 tests/test_cognitive_memory.py -v
+python3 -m unittest discover -s tests -v
 
 # 2. 运行全流程跨周期仿真验证
-python3 cli_demo.py --auto-demo
+python3 -m xh_aegis.cli --auto-demo
 ```
 
 **脱敏与安全铁律**：严禁在 PR、测试样例或 `.gitignore` 中提交任何真实 API Key（`sk-...`、`ghp_...`）、个人真实隐私日记或客户敏感域名。详情请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [SECURITY.md](SECURITY.md)。
